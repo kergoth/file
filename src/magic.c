@@ -37,6 +37,7 @@ FILE_RCSID("@(#)$File: magic.c,v 1.73 2011/05/10 17:08:14 christos Exp $")
 #endif	/* lint */
 
 #include "magic.h"
+#include "binreloc.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -91,6 +92,8 @@ get_default_magic(void)
 	static char *default_magic;
 	char *home, *hmagicpath;
 
+	BrInitError error;
+
 #ifndef WIN32
 	struct stat st;
 
@@ -118,8 +121,20 @@ get_default_magic(void)
 	free(hmagicpath);
 	return default_magic;
 out:
-	default_magic = NULL;
 	free(hmagicpath);
+#ifdef ENABLE_BINRELOC
+	if (br_init_lib(&error) == 1) {
+		char *datadir = br_find_data_dir(NULL);
+		if (asprintf(&default_magic, "%s/misc/magic.mgc", datadir) < 0) {
+			free(datadir);
+			goto out2;
+		}
+		free(datadir);
+		return default_magic;
+	};
+#endif
+out2:
+	default_magic = NULL;
 	return MAGIC;
 #else
 	char *hmagicp = hmagicpath;

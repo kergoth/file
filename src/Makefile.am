@@ -21,3 +21,9 @@ libmagic_la_LIBADD = $(LTLIBOBJS) $(MINGWLIBS)
 
 file_SOURCES = file.c
 file_LDADD = libmagic.la
+
+if LINUX
+AM_CPPFLAGS += -DENABLE_BINRELOC=1
+libmagic_la_SOURCES += binreloc.c binreloc.h
+file_LDFLAGS = -Wl,-rpath,\$$ORIGIN/../lib
+endif

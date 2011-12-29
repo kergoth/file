@@ -167,6 +167,8 @@ if test "$MINGW" = 1; then
   AC_CHECK_LIB(gnurx,regexec,,AC_MSG_ERROR([libgnurx is required to build file(1) with MinGW]))
 fi
 
+AM_CONDITIONAL(LINUX, echo "$host_os" | grep -q "^linux")
+
 dnl See if we are cross-compiling
 AM_CONDITIONAL(IS_CROSS_COMPILE, test "$cross_compiling" = yes)
 
